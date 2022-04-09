@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>bags_printer</name>
+  <version>0.0.0</version>
+  <description>The bags_printer package</description>
+  <maintainer email="alberto.nidasio@mail.polimi.it">Alberto Nidasio</maintainer>
+  <license>GPLv3</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+</package>

@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="bags_printer" type="bags_printer_node" name="bags_printer_node" output="screen" />
+    <node pkg="rosbag" type="play" name="player" args="--clock $(find bags_printer)/../../bags/bag1.bag" />
+</launch>
