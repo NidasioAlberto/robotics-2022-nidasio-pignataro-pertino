@@ -19,23 +19,29 @@ using namespace Eigen;
 
 Publisher pub;
 
-void wheelStateCallback(const JointState::ConstPtr &msg);
+void wheelStateCallback(const JointState::ConstPtr& msg);
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     init(argc, argv, "listener");
-    NodeHandle handle;
 
+    // Configure the computer to use the encoders
+    VelocityComputer::getInstance().setComputeMethod(
+        VelocityComputer::ComputeMethod::ENCODER);
+
+    NodeHandle handle;
     Subscriber sub = handle.subscribe("wheel_states", 1000, wheelStateCallback);
     pub            = handle.advertise<TwistStamped>("cmd_vel", 1000);
 
     spin();
 }
 
-void wheelStateCallback(const JointState::ConstPtr &msg)
+void wheelStateCallback(const JointState::ConstPtr& msg)
 {
     // Compute the robot velocity
     auto V = VelocityComputer::getInstance().computeRobotVelocity(msg);
+
+    std::cout << V.transpose() << std::endl;
 
     // Publish the message
     TwistStamped twistMsg;
