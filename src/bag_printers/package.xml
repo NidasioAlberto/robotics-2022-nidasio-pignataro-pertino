@@ -4,6 +4,8 @@
   <version>0.0.0</version>
   <description>The bag_printers package</description>
   <maintainer email="alberto.nidasio@mail.polimi.it">Alberto Nidasio</maintainer>
+  <maintainer email="matteo.pignataro@mail.polimi.it">Matteo Pignataro</maintainer>
+  <maintainer email="paolo.pertino@mail.polimi.it">Paolo Pertino</maintainer>
   <license>GPLv3</license>
 
   <buildtool_depend>catkin</buildtool_depend>
