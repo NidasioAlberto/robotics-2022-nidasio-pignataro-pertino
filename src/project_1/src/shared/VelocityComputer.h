@@ -1,4 +1,3 @@
-#include <geometry_msgs/TwistStamped.h>
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
 
@@ -65,7 +64,7 @@ private:
      */
     Eigen::Vector3d computeRobotVelocityFromWheelVelocity(Eigen::Vector4d U);
 
-    ComputeMethod computeMethod;
+    ComputeMethod computeMethod = ComputeMethod::RMP;
 
     // Robot parameters
     double R = 0.07;       // Wheel radius [m]
@@ -141,6 +140,9 @@ Eigen::Vector3d VelocityComputer::computeRobotVelocityWithRPM(
     // Apply the gear ratio 5:1
     U = U * T;
 
+    // TODO: Why a second reduction is needed??????
+    U = U * T;
+
     // Compute the robot velicity
     return computeRobotVelocityFromWheelVelocity(U);
 }
@@ -168,6 +170,9 @@ Eigen::Vector3d VelocityComputer::computeRobotVelocityWithENCODER(
 
     // Transform the velocity from counts/s to rad/s
     U = U / N * 2 * M_PI;
+
+    // Apply the gear ratio 5:1
+    U = U * T;
 
     // Compute the robot velicity
     return computeRobotVelocityFromWheelVelocity(U);

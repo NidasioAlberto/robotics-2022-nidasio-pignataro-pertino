@@ -41,8 +41,6 @@ void wheelStateCallback(const JointState::ConstPtr& msg)
     // Compute the robot velocity
     auto V = VelocityComputer::getInstance().computeRobotVelocity(msg);
 
-    std::cout << V.transpose() << std::endl;
-
     // Publish the message
     TwistStamped twistMsg;
     twistMsg.header.stamp    = msg->header.stamp;

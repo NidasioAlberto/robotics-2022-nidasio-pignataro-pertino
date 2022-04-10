@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="project_1" type="velocity_computer" name="velocity_computer" output="screen" />
+    <node pkg="project_1" type="odometry_computer" name="odometry_computer" output="screen" />
+    <node pkg="rosbag" type="play" name="player" args="--loop -r 5 $(find project_1)/../../bags/bag3.bag" />
+</launch>

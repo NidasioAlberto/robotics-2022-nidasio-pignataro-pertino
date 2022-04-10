@@ -11,6 +11,9 @@ find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   cmake_modules
 )
+generate_dynamic_reconfigure_options(
+  cfg/parameters.cfg
+)
 find_package(Eigen REQUIRED)
 
 ###################
@@ -21,8 +24,14 @@ catkin_package(
 )
 include_directories(include ${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS})
 
+
 #################
 ## Executables ##
 #################
 add_executable(velocity_computer src/velocity_computer.cpp)
+add_dependencies(velocity_computer ${catkin_EXPORTED_TARGETS})
 target_link_libraries(velocity_computer ${catkin_LIBRARIES})
+
+add_executable(odometry_computer src/odometry_computer.cpp)
+add_dependencies(odometry_computer ${catkin_EXPORTED_TARGETS})
+target_link_libraries(odometry_computer ${catkin_LIBRARIES})
