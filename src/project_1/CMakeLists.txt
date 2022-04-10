@@ -9,10 +9,20 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
   dynamic_reconfigure
+  cmake_modules
 )
+find_package(Eigen REQUIRED)
 
 ###################
 ## Configuration ##
 ###################
-catkin_package()
-include_directories(include ${catkin_INCLUDE_DIRS})
+catkin_package(
+  DEPENDS Eigen
+)
+include_directories(include ${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS})
+
+#################
+## Executables ##
+#################
+add_executable(velocity_computer src/velocity_computer.cpp)
+target_link_libraries(velocity_computer ${catkin_LIBRARIES})
