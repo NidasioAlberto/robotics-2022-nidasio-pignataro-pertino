@@ -131,14 +131,7 @@ Eigen::Vector3d OdometryComputer::computeOdometryEuler(
     // Calculate the delta of time
     double T = msg->header.stamp.toSec() - previousTime;
 
-    // Velocity norm
-    /*double V = sqrt(previousVelocity[0] * previousVelocity[0] +
-                    previousVelocity[1] * previousVelocity[1]);
-
-    // Rotate the velocity from the robot from to the absolute frame
-    previousVelocity[0] = V * cos(initialPosition[2]);
-    previousVelocity[1] = V * sin(initialPosition[2]);*/
-
+    // Calculate and rotate the velocities
     Eigen::Vector2d V;
     V[0] = previousVelocity[0];
     V[1] = previousVelocity[1];
@@ -176,6 +169,7 @@ Eigen::Vector3d OdometryComputer::computeOdometryEuler(
     return result;
 }
 
+//TODO To be tried
 Eigen::Vector3d OdometryComputer::computeOdometryRunge(
     const geometry_msgs::TwistStamped::ConstPtr &msg)
 {
@@ -186,13 +180,22 @@ Eigen::Vector3d OdometryComputer::computeOdometryRunge(
     // Calculate the delta of time
     double T = msg->header.stamp.toSec() - previousTime;
 
-    // Velocity norm
-    double V = sqrt(previousVelocity[0] * previousVelocity[0] +
-                    previousVelocity[1] * previousVelocity[1]);
+    // Calculate and rotate the velocities
+    Eigen::Vector2d V;
+    V[0] = previousVelocity[0];
+    V[1] = previousVelocity[1];
+
+    Eigen::Matrix2d rotationMatrix;
+    rotationMatrix << cos(initialPosition[2] + previousVelocity[2] * T / 2), -sin(initialPosition[2] + previousVelocity[2] * T / 2),
+        sin(initialPosition[2] + previousVelocity[2] * T / 2), cos(initialPosition[2] + previousVelocity[2] * T / 2);
+
+    //Rotate
+    V = rotationMatrix * V;
 
     // clang-format off
-    initialPosition[0] = initialPosition[0] + V * T * cos(initialPosition[2] + previousVelocity[2] * T / 2);
-    initialPosition[1] = initialPosition[1] + V * T * sin(initialPosition[2] + previousVelocity[2] * T / 2);
+    // Integrate
+    initialPosition[0] = initialPosition[0] + V[0] * T;
+    initialPosition[1] = initialPosition[1] + V[1] * T;
     initialPosition[2] = initialPosition[2] + previousVelocity[2] * T;
     // clang-format on
 
