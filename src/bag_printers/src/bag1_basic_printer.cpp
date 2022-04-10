@@ -23,6 +23,6 @@ void wheelStateCallback(const JointState::ConstPtr &msg)
     ROS_INFO("Joints count: %d", msg->name.size());
 
     for (int i = 0; i < msg->name.size(); i++)
-        ROS_INFO("Joint %s: %f %f %f", msg->name[i].c_str(), msg->position[i],
+        ROS_INFO("Joint %s: %f %f", msg->name[i].c_str(), msg->position[i],
                  msg->velocity[i]);
 }

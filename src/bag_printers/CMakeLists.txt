@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(bags_printer)
+project(bag_printers)
 
 ###########################
 ## Packages dependencies ##
@@ -15,5 +15,5 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 #################
 ## Executables ##
 #################
-add_executable(${PROJECT_NAME}_node src/bags_printer_node.cpp)
-target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES})
+add_executable(bag1_basic_printer src/bag1_basic_printer.cpp)
+target_link_libraries(bag1_basic_printer ${catkin_LIBRARIES})

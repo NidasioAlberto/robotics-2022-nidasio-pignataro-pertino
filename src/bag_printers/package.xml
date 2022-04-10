@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>bags_printer</name>
+  <name>bag_printers</name>
   <version>0.0.0</version>
-  <description>The bags_printer package</description>
+  <description>The bag_printers package</description>
   <maintainer email="alberto.nidasio@mail.polimi.it">Alberto Nidasio</maintainer>
   <license>GPLv3</license>
 
