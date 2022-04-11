@@ -135,7 +135,7 @@ Eigen::Vector3d VelocityComputer::computeRobotVelocityWithRPM(
     U(3) = msg->velocity[2];  // Rear left
 
     // Transform velocities from RMP to rad/s
-    U = U / 60 * 2 * M_PI;
+    U = U / 60;
 
     // Apply the gear ratio 5:1
     U = U * T;
