@@ -13,38 +13,9 @@ using namespace ros;
 using namespace Eigen;
 
 void velocityStateCallback(const geometry_msgs::TwistStamped::ConstPtr &msg);
+void integrationMethodChangeCallback(int *integrationMode, project_1::parametersConfig &config, uint32_t level);
 
 Publisher pub, pub2;
-
-/**
- * @brief Triggered when the `integration_method` config parameter gets
- * dynamically reconfigured.
- *
- * @param integrationMode current integration mode (0 - Euler integration | 1 -
- * Runge-Kutta integration)
- * @param
- */
-void integrationMethodChangeCallback(int *integrationMode,
-                                     project_1::parametersConfig &config,
-                                     uint32_t level)
-{
-    ROS_INFO(
-        "Reconfiguring integration mode.\nPrevious integration mode: "
-        "%s\nCurrent integration mode: %s",
-        *integrationMode == 0 ? "Euler integration mode"
-                              : "Runge-Kutta integration mode",
-        config.integration_method == 0 ? "Euler integration mode"
-                                       : "Runge-Kutta integration mode");
-
-    // Switching to the new integration method selected by the user.
-    *integrationMode = config.integration_method;
-}
-
-/**
- * Setting up the integration mode:
- *      0 - Euler integration mode (default)
- *      1 - Runge-Kutta integration mode
- */
 int integrationMode = 0;
 
 int main(int argc, char **argv)
@@ -53,15 +24,14 @@ int main(int argc, char **argv)
     init(argc, argv, "odometry_computer");
     NodeHandle handle;
 
+    // TODO: verificare possibilità di raggruppare i callback per switch metodo di integrazione e switch data sources delle ruote
+    //       in un unico nodo
     dynamic_reconfigure::Server<project_1::parametersConfig> dynServer;
-    dynamic_reconfigure::Server<project_1::parametersConfig>::CallbackType
-        callbackFunction;
-    callbackFunction =
-        boost::bind(&integrationMethodChangeCallback, &integrationMode, _1, _2);
+    dynamic_reconfigure::Server<project_1::parametersConfig>::CallbackType callbackFunction;
+    callbackFunction = boost::bind(&integrationMethodChangeCallback, &integrationMode, _1, _2);
     dynServer.setCallback(callbackFunction);
 
-    OdometryComputer::getInstance().setIntegrationMethod(
-        OdometryComputer::OdometryIntegration::EULER);
+    OdometryComputer::getInstance().setIntegrationMethod(OdometryComputer::OdometryIntegration::EULER);
     OdometryComputer::getInstance().setInitialPosition({0, 0, 0});
 
     Subscriber sub = handle.subscribe("cmd_vel", 1000, velocityStateCallback);
@@ -87,7 +57,6 @@ void velocityStateCallback(const geometry_msgs::TwistStamped::ConstPtr &msg)
     transformStamped.transform.rotation.z = q.z();
     transformStamped.transform.rotation.w = q.w();
     */
-    // OdometryComputer::getInstance().setIntegrationMethod(integrationMode);
     Vector3d result = OdometryComputer::getInstance().computeOdometry(msg);
 
     geometry_msgs::PoseStamped message;
@@ -105,4 +74,35 @@ void velocityStateCallback(const geometry_msgs::TwistStamped::ConstPtr &msg)
     message.pose.orientation.w = quat.getW();
 
     pub2.publish(message);
+}
+
+/**
+ * @brief Triggered when the `integration_method` config parameter gets
+ * dynamically reconfigured.
+ *
+ * @param integrationMode current integration mode (0 - Euler integration | 1 -
+ * Runge-Kutta integration)
+ * @param config configuration file to fetch parameters
+ * @param level _
+ */
+void integrationMethodChangeCallback(int *integrationMode, project_1::parametersConfig &config, uint32_t level)
+{
+    ROS_INFO(
+        "Reconfiguring integration mode.\nPrevious integration mode: "
+        "%s\nCurrent integration mode: %s",
+        *integrationMode == 0 ? "Euler integration mode"
+                              : "Runge-Kutta integration mode",
+        config.integration_method == 0 ? "Euler integration mode"
+                                       : "Runge-Kutta integration mode");
+
+    /**
+     * Switching to the new integration method selected by the user.
+     * Setting up the integration mode:
+     *      0 - Euler integration mode (default)
+     *      1 - Runge-Kutta integration mode
+     */
+    OdometryComputer::getInstance().setIntegrationMethod(config.integration_method == 0
+                                                            ? OdometryComputer::OdometryIntegration::EULER 
+                                                            : OdometryComputer::OdometryIntegration::RUNGE_KUTTA);
+    *integrationMode = config.integration_method;
 }
