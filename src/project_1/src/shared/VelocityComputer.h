@@ -140,9 +140,6 @@ Eigen::Vector3d VelocityComputer::computeRobotVelocityWithRPM(
     // Apply the gear ratio 5:1
     U = U * T;
 
-    // TODO: Why a second reduction is needed??????
-    U = U * T;
-
     // Compute the robot velicity
     return computeRobotVelocityFromWheelVelocity(U);
 }
