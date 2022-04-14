@@ -12,7 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules
 )
 generate_dynamic_reconfigure_options(
-  cfg/parameters.cfg
+  cfg/wheelsDataSource.cfg
+  cfg/integrationMethod.cfg
 )
 find_package(Eigen REQUIRED)
 

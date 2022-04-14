@@ -1,7 +1,7 @@
 #include <dynamic_reconfigure/server.h>
-#include <project_1/parametersConfig.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <math.h>
+#include <project_1/wheelsDataSourceConfig.h>
 #include <ros/console.h>
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
@@ -22,19 +22,24 @@ using namespace Eigen;
 Publisher pub;
 int wheelsDataSource = 0;
 
-void wheelStateCallback(const JointState::ConstPtr& msg);
-void wheelsDataSourceChangeCallback(int *dataSource, project_1::parametersConfig &config, uint32_t level);
+void wheelStateCallback(const JointState::ConstPtr &msg);
+void wheelsDataSourceChangeCallback(int *dataSource,
+                                    project_1::wheelsDataSourceConfig &config,
+                                    uint32_t level);
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     init(argc, argv, "listener");
     NodeHandle handle;
 
-    // TODO: verificare possibilità di raggruppare i callback per switch metodo di integrazione e switch data sources delle ruote
+    // TODO: verificare possibilità di raggruppare i callback per switch metodo
+    // di integrazione e switch data sources delle ruote
     //       in un unico nodo
-    dynamic_reconfigure::Server<project_1::parametersConfig> dynServer;
-    dynamic_reconfigure::Server<project_1::parametersConfig>::CallbackType callbackFunction;
-    callbackFunction = boost::bind(&wheelsDataSourceChangeCallback, &wheelsDataSource, _1, _2);
+    dynamic_reconfigure::Server<project_1::wheelsDataSourceConfig> dynServer;
+    dynamic_reconfigure::Server<project_1::wheelsDataSourceConfig>::CallbackType
+        callbackFunction;
+    callbackFunction =
+        boost::bind(&wheelsDataSourceChangeCallback, &wheelsDataSource, _1, _2);
     dynServer.setCallback(callbackFunction);
 
     Subscriber sub = handle.subscribe("wheel_states", 1000, wheelStateCallback);
@@ -43,7 +48,7 @@ int main(int argc, char** argv)
     spin();
 }
 
-void wheelStateCallback(const JointState::ConstPtr& msg)
+void wheelStateCallback(const JointState::ConstPtr &msg)
 {
     // Compute the robot velocity
     auto V = VelocityComputer::getInstance().computeRobotVelocity(msg);
@@ -57,15 +62,15 @@ void wheelStateCallback(const JointState::ConstPtr& msg)
     pub.publish(twistMsg);
 }
 
-void wheelsDataSourceChangeCallback(int *dataSource, project_1::parametersConfig &config, uint32_t level)
+void wheelsDataSourceChangeCallback(int *dataSource,
+                                    project_1::wheelsDataSourceConfig &config,
+                                    uint32_t level)
 {
     ROS_INFO(
         "Reconfiguring wheels data sources.\nPrevious wheels data sources: "
         "%s\nCurrent data source: %s",
-        *dataSource == 0 ? "RPM source"
-                         : "Ticks source",
-        config.wheel_data_source == 0 ? "RPM source"
-                                       : "Ticks source");
+        *dataSource == 0 ? "RPM source" : "Ticks source",
+        config.wheel_data_source == 0 ? "RPM source" : "Ticks source");
 
     /**
      * Switching to the new integration method selected by the user.
@@ -73,8 +78,9 @@ void wheelsDataSourceChangeCallback(int *dataSource, project_1::parametersConfig
      *      0 - RPM wheels data source (default)
      *      1 - Ticks wheels data source
      */
-    VelocityComputer::getInstance().setComputeMethod(config.wheel_data_source == 0
-                                                            ? VelocityComputer::ComputeMethod::RMP
-                                                            : VelocityComputer::ComputeMethod::ENCODER);
+    VelocityComputer::getInstance().setComputeMethod(
+        config.wheel_data_source == 0
+            ? VelocityComputer::ComputeMethod::RMP
+            : VelocityComputer::ComputeMethod::ENCODER);
     *dataSource = config.wheel_data_source;
 }

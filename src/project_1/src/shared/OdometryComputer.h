@@ -8,16 +8,16 @@
 
 /**
  * Euler integration:
- * X(k + 1) = X(k) + V(k) * T * cos(Theta(k))
- * Y(k + 1) = Y(k) + V(k) * T * sin(Theta(k))
- * Theta(k + 1) = Theta(k) + w(k) * T
- * T = t(k + 1) - t(k)
+ *   X(k + 1) = X(k) + V(k) * T * cos(Theta(k))
+ *   Y(k + 1) = Y(k) + V(k) * T * sin(Theta(k))
+ *   Theta(k + 1) = Theta(k) + w(k) * T
+ *   T = t(k + 1) - t(k)
  *
  * Runge-Kutta integration:
- * X(k + 1) = X(k) + V(k) * T * cos(Theta(k) + w(k) * T / 2)
- * Y(k + 1) = Y(k) + V(k) * T * sin(Theta(k) + w(k) * T / 2)
- * Theta(k + 1) = Theta(k) + w(k) * T
- * T = t(k + 1) - t(k)
+ *   X(k + 1) = X(k) + V(k) * T * cos(Theta(k) + w(k) * T / 2)
+ *   Y(k + 1) = Y(k) + V(k) * T * sin(Theta(k) + w(k) * T / 2)
+ *   Theta(k + 1) = Theta(k) + w(k) * T
+ *   T = t(k + 1) - t(k)
  */
 
 class OdometryComputer : public Singleton<OdometryComputer>
@@ -25,192 +25,148 @@ class OdometryComputer : public Singleton<OdometryComputer>
     friend class Singleton<OdometryComputer>;
 
 public:
-    enum class OdometryIntegration
+    enum class IntegrationMethod
     {
         EULER,
         RUNGE_KUTTA
     };
 
     /**
-     * @brief Computes the odometry given the linear velocity and angular
-     * velocity
+     * @brief Computes the odometry given the linear and angular velocities.
      *
      * @param msg The twisted msg received from the topic
-     * @return Eigen::Vector3d The vector that contains the 2d position and
-     * theta
+     * @return The robot linear position and rotation [x y theta]
      */
     Eigen::Vector3d computeOdometry(
         const geometry_msgs::TwistStamped::ConstPtr &msg);
 
     /**
-     * @brief Set the Integration Method object
-     *
-     * @param i The method integration
+     * @brief Set the integration method between EULER and RUNGE_KUTTA.
      */
-    void setIntegrationMethod(const OdometryIntegration i);
+    void setIntegrationMethod(const IntegrationMethod integrationMethod);
 
     /**
-     * @brief Set the Initial Position of the robot
+     * @brief Override the robot's position.
      *
-     * @param position The 3d eigen vector with posX, posY and theta format
+     * @param position Linear and angular position [x y theta]
      */
-    void setInitialPosition(const Eigen::Vector3d position);
+    void setPosition(const Eigen::Vector3d position);
 
 private:
-    /**
-     * @brief Private constructor for singleton purposes
-     */
-    OdometryComputer() {}
+    OdometryComputer();
 
-    /**
-     * @brief Method to compute the odometry following the Euler integration
-     * method
-     *
-     * @param msg The message to compute
-     * @return Eigen::Vector3d The vector of results
-     */
     Eigen::Vector3d computeOdometryEuler(
         const geometry_msgs::TwistStamped::ConstPtr &msg);
 
-    /**
-     * @brief Method to compute the odometry following the Runge-Kutta
-     * integration method
-     *
-     * @param msg The message to compute
-     * @return Eigen::Vector3d The vector of results
-     */
     Eigen::Vector3d computeOdometryRunge(
         const geometry_msgs::TwistStamped::ConstPtr &msg);
 
-    /**
-     * @brief Internal integration method
-     */
-    OdometryIntegration integration;
+    IntegrationMethod integrationMethod;
 
-    /**
-     * @brief Initial position
-     * FORMAT: PosX, PosY, Theta
-     */
-    Eigen::Vector3d initialPosition;
+    Eigen::Vector3d position =
+        Eigen::Vector3d::Zero();  // Position in world frame [x y theta]
+
+    // Previous timestamp and velocities
+    double previousTimestamp = 0;
 };
 
-void OdometryComputer::setIntegrationMethod(const OdometryIntegration i)
+void OdometryComputer::setIntegrationMethod(
+    const IntegrationMethod integrationMethod)
 {
-    this->integration = i;
+    this->integrationMethod = integrationMethod;
 }
 
-void OdometryComputer::setInitialPosition(const Eigen::Vector3d position)
+void OdometryComputer::setPosition(const Eigen::Vector3d position)
 {
-    this->initialPosition[0] = position[0];
-    this->initialPosition[1] = position[1];
-    this->initialPosition[2] = position[2];
+    this->position = position;
 }
 
 Eigen::Vector3d OdometryComputer::computeOdometry(
     const geometry_msgs::TwistStamped::ConstPtr &msg)
 {
     // Dispatch the request depending on the integration method
-    switch (integration)
+    switch (integrationMethod)
     {
-        case OdometryIntegration::EULER:
+        case IntegrationMethod::EULER:
             return computeOdometryEuler(msg);
-        case OdometryIntegration::RUNGE_KUTTA:
+        case IntegrationMethod::RUNGE_KUTTA:
             return computeOdometryRunge(msg);
         default:
             return Eigen::Vector3d::Zero();
     }
 }
 
+OdometryComputer::OdometryComputer() {}
+
 Eigen::Vector3d OdometryComputer::computeOdometryEuler(
     const geometry_msgs::TwistStamped::ConstPtr &msg)
 {
-    // Informations about the previous step
-    static double previousTime              = 0;
-    static Eigen::Vector3d previousVelocity = Eigen::Vector3d::Zero();
+    // Compute the time delta
+    double deltaT = msg->header.stamp.toSec() - previousTimestamp;
 
-    // Calculate the delta of time
-    double T = msg->header.stamp.toSec() - previousTime;
+    // Compute the position only after the first message
+    if (previousTimestamp != 0 && deltaT > 0)
+    {
+        // Extract the robot's velocities
+        Eigen::Vector3d V;
+        V[0] = msg->twist.linear.x;   // x
+        V[1] = msg->twist.linear.y;   // y
+        V[2] = msg->twist.angular.z;  // theta
 
-    // Calculate and rotate the velocities
-    Eigen::Vector2d V;
-    V[0] = previousVelocity[0];
-    V[1] = previousVelocity[1];
+        // Prepare the rotation matrix for the velocities
+        // clang-format off
+        Eigen::Matrix3d rotationMatrix;
+        rotationMatrix << cos(position[2]), -sin(position[2]), 0,
+                          sin(position[2]),  cos(position[2]), 0,
+                          0,                 0,                1;
+        // clang-format on
 
-    Eigen::Matrix2d rotationMatrix;
-    rotationMatrix << cos(initialPosition[2]), -sin(initialPosition[2]),
-        sin(initialPosition[2]), cos(initialPosition[2]);
+        // Rotate the reported robot velocities in the current world frame
+        V = rotationMatrix * V;
 
-    std::cout << "rotationMatrix" << std::endl;
-    std::cout << rotationMatrix << std::endl;
-
-    V = rotationMatrix * V;
-
-    std::cout << "V" << std::endl;
-    std::cout << V << std::endl;
-
-    // Integrate
-    initialPosition[0] = initialPosition[0] + V[0] * T;
-    initialPosition[1] = initialPosition[1] + V[1] * T;
-    initialPosition[2] = initialPosition[2] + previousVelocity[2] * T;
+        // Integrate
+        position = position + V * deltaT;
+    }
 
     // Save current timestamp for next iteration
-    previousTime = msg->header.stamp.toSec();
+    previousTimestamp = msg->header.stamp.toSec();
 
-    // Set the new velocities
-    previousVelocity[0] = msg->twist.linear.x;
-    previousVelocity[1] = msg->twist.linear.y;
-    previousVelocity[2] = msg->twist.angular.z;
-
-    // Return the result
-    Eigen::Vector3d result;
-    result[0] = initialPosition[0];
-    result[1] = initialPosition[1];
-    result[2] = initialPosition[2];
-    return result;
+    return position;
 }
 
-//TODO To be tried
 Eigen::Vector3d OdometryComputer::computeOdometryRunge(
     const geometry_msgs::TwistStamped::ConstPtr &msg)
 {
-    // Informations about the previous step
-    static double previousTime              = 0;
-    static Eigen::Vector3d previousVelocity = Eigen::Vector3d::Zero();
+    // Compute the time delta
+    double deltaT = msg->header.stamp.toSec() - previousTimestamp;
 
-    // Calculate the delta of time
-    double T = msg->header.stamp.toSec() - previousTime;
+    // Compute the position only after the first message
+    if (previousTimestamp != 0 && deltaT > 0)
+    {
+        // Extract the robot's velocities
+        Eigen::Vector3d V;
+        V[0] = msg->twist.linear.x;   // x
+        V[1] = msg->twist.linear.y;   // y
+        V[2] = msg->twist.angular.z;  // theta
 
-    // Calculate and rotate the velocities
-    Eigen::Vector2d V;
-    V[0] = previousVelocity[0];
-    V[1] = previousVelocity[1];
+        // Prepare the rotation matrix for the velocities
+        // clang-format off
+        Eigen::Matrix3d rotationMatrix;
+        rotationMatrix << cos(position[2] + V[2] * deltaT / 2), -sin(position[2] + V[2] * deltaT / 2), 0,
+                          sin(position[2] + V[2] * deltaT / 2),  cos(position[2] + V[2] * deltaT / 2), 0,
+                          0,                                     0,                                    1;
+        // clang-format on
 
-    Eigen::Matrix2d rotationMatrix;
-    rotationMatrix << cos(initialPosition[2] + previousVelocity[2] * T / 2), -sin(initialPosition[2] + previousVelocity[2] * T / 2),
-        sin(initialPosition[2] + previousVelocity[2] * T / 2), cos(initialPosition[2] + previousVelocity[2] * T / 2);
+        // Rotate the reported robot velocities in the current world
+        // frame
+        V = rotationMatrix * V;
 
-    //Rotate
-    V = rotationMatrix * V;
+        // Integrate
+        position = position + V * deltaT;
+    }
 
-    // clang-format off
-    // Integrate
-    initialPosition[0] = initialPosition[0] + V[0] * T;
-    initialPosition[1] = initialPosition[1] + V[1] * T;
-    initialPosition[2] = initialPosition[2] + previousVelocity[2] * T;
-    // clang-format on
+    // Save current timestamp for next iteration
+    previousTimestamp = msg->header.stamp.toSec();
 
-    // Set the new previous time
-    previousTime = msg->header.stamp.toSec();
-
-    // Set the new velocities
-    previousVelocity[0] = msg->twist.linear.x;
-    previousVelocity[1] = msg->twist.linear.y;
-    previousVelocity[2] = msg->twist.angular.z;
-
-    // Return the result
-    Eigen::Vector3d result;
-    result[0] = initialPosition[0];
-    result[1] = initialPosition[1];
-    result[2] = initialPosition[2];
-    return result;
+    return position;
 }
