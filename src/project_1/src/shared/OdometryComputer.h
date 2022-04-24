@@ -78,7 +78,8 @@ void OdometryComputer::setIntegrationMethod(
 
 void OdometryComputer::setPosition(const Eigen::Vector3d position)
 {
-    this->position = position;
+    this->position          = position;
+    this->previousTimestamp = 0;
 }
 
 Eigen::Vector3d OdometryComputer::computeOdometry(

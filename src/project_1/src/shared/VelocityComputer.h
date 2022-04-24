@@ -1,10 +1,10 @@
+#pragma once
+
 #include <sensor_msgs/JointState.h>
 
 #include <Eigen/Core>
 
 #include "Singleton.h"
-
-#pragma once
 
 /**
  * @brief The VelocityComputer calculate the robot's speed from all the 4

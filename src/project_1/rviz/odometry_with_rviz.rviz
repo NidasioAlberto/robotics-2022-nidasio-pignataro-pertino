@@ -7,7 +7,9 @@ Panels:
         - /Global Options1
         - /Status1
         - /Pose1
-        - /Pose2
+        - /Odometry1
+        - /Odometry1/Shape1
+        - /Odometry1/Covariance1
       Splitter Ratio: 0.5
     Tree Height: 927
   - Class: rviz/Selection
@@ -70,19 +72,38 @@ Visualization Manager:
       Topic: /robot/pose
       Unreliable: false
       Value: true
-    - Alpha: 1
-      Axes Length: 1
-      Axes Radius: 0.10000000149011612
-      Class: rviz/Pose
-      Color: 138; 226; 52
+    - Angle Tolerance: 0.10000000149011612
+      Class: rviz/Odometry
+      Covariance:
+        Orientation:
+          Alpha: 0.5
+          Color: 255; 255; 127
+          Color Style: Unique
+          Frame: Local
+          Offset: 1
+          Scale: 1
+          Value: true
+        Position:
+          Alpha: 0.30000001192092896
+          Color: 204; 51; 204
+          Scale: 1
+          Value: true
+        Value: false
       Enabled: true
-      Head Length: 0.30000001192092896
-      Head Radius: 0.10000000149011612
-      Name: Pose
-      Shaft Length: 1
-      Shaft Radius: 0.05000000074505806
-      Shape: Arrow
-      Topic: /pose
+      Keep: 1
+      Name: Odometry
+      Position Tolerance: 0.10000000149011612
+      Shape:
+        Alpha: 1
+        Axes Length: 1
+        Axes Radius: 0.10000000149011612
+        Color: 138; 226; 52
+        Head Length: 0.30000001192092896
+        Head Radius: 0.10000000149011612
+        Shaft Length: 1
+        Shaft Radius: 0.05000000074505806
+        Value: Arrow
+      Topic: /odom
       Unreliable: false
       Value: true
   Enabled: true
@@ -120,12 +141,12 @@ Visualization Manager:
         Value: false
       Invert Z Axis: false
       Name: Current View
-      Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5707963705062866
+      Near Clip Distance: 0
+      Pitch: 1.57079632679
       Position:
-        X: 0.40000173449516296
-        Y: -0.15000098943710327
-        Z: 15.999999046325684
+        X: 0
+        Y: 0
+        Z: 16
       Target Frame: <Fixed Frame>
       Value: FPS (rviz)
       Yaw: 0
@@ -147,4 +168,4 @@ Window Geometry:
     collapsed: false
   Width: 1690
   X: 1600
-  Y: 64
+  Y: 34
