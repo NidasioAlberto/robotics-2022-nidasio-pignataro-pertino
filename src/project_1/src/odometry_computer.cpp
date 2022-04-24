@@ -47,8 +47,7 @@ int main(int argc, char **argv)
 
     Subscriber sub = handle.subscribe("cmd_vel", 1000, velocityStateCallback);
     pub            = handle.advertise<nav_msgs::Odometry>("odom", 1000);
-
-    pub2 = handle.advertise<geometry_msgs::PoseStamped>("pose", 1000);
+    pub2           = handle.advertise<geometry_msgs::PoseStamped>("pose", 1000);
 
     spin();
 }

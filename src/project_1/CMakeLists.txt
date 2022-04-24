@@ -56,6 +56,10 @@ add_executable(odometry_computer src/odometry_computer.cpp)
 add_dependencies(odometry_computer ${catkin_EXPORTED_TARGETS})
 target_link_libraries(odometry_computer ${catkin_LIBRARIES})
 
+add_executable(position_comparison src/position_comparison.cpp)
+add_dependencies(position_comparison ${catkin_EXPORTED_TARGETS})
+target_link_libraries(position_comparison ${catkin_LIBRARIES})
+
 add_executable(velocity_computer src/velocity_computer.cpp)
 add_dependencies(velocity_computer ${catkin_EXPORTED_TARGETS})
 target_link_libraries(velocity_computer ${catkin_LIBRARIES})
