@@ -24,7 +24,7 @@ void odometryCallback(const geometry_msgs::PoseStamped::ConstPtr &msg);
 int main(int argc, char **argv)
 {
     // Node setup
-    init(argc, argv, "odometry_computer");
+    init(argc, argv, "position_comparison");
     NodeHandle handle;
 
     // Setting up the services server

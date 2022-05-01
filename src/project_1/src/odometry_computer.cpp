@@ -1,5 +1,6 @@
 #include <dynamic_reconfigure/server.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <project_1/ResetStartingPose.h>
@@ -7,6 +8,7 @@
 #include <ros/console.h>
 #include <ros/ros.h>
 #include <tf2/LinearMath/Quaternion.h>
+#include <tf2_ros/transform_broadcaster.h>
 
 #include "shared/OdometryComputer.h"
 
@@ -20,6 +22,7 @@ bool resetStartingPose(project_1::ResetStartingPose::Request &req,
                        project_1::ResetStartingPose::Response &res);
 
 Publisher pub, pub2;
+// tf2_ros::TransformBroadcaster tf_pub;
 
 int main(int argc, char **argv)
 {
@@ -43,8 +46,6 @@ int main(int argc, char **argv)
     OdometryComputer::getInstance().setIntegrationMethod(
         OdometryComputer::IntegrationMethod::EULER);
 
-    OdometryComputer::getInstance().setPosition({0, 0, 0});
-
     Subscriber sub = handle.subscribe("cmd_vel", 1000, velocityStateCallback);
     pub            = handle.advertise<nav_msgs::Odometry>("odom", 1000);
     pub2           = handle.advertise<geometry_msgs::PoseStamped>("pose", 1000);
@@ -58,20 +59,30 @@ void velocityStateCallback(const geometry_msgs::TwistStamped::ConstPtr &msg)
     tf2::Quaternion quat;
 
     nav_msgs::Odometry odometryMsg;
+    geometry_msgs::TransformStamped broadcastMsg;
 
-    odometryMsg.header          = msg->header;
-    odometryMsg.header.frame_id = "world";
+    odometryMsg.header           = msg->header;
+    broadcastMsg.header          = msg->header;
+    odometryMsg.header.frame_id  = "world";
+    broadcastMsg.header.frame_id = "world";
 
-    odometryMsg.pose.pose.position.x = result[0];
-    odometryMsg.pose.pose.position.y = result[1];
+    odometryMsg.pose.pose.position.x     = result[0];
+    odometryMsg.pose.pose.position.y     = result[1];
+    broadcastMsg.transform.translation.x = result[0];
+    broadcastMsg.transform.translation.y = result[1];
 
     quat.setEuler(0, 0, result[2]);
     odometryMsg.pose.pose.orientation.x = quat.getX();
     odometryMsg.pose.pose.orientation.y = quat.getY();
     odometryMsg.pose.pose.orientation.z = quat.getZ();
     odometryMsg.pose.pose.orientation.w = quat.getW();
+    broadcastMsg.transform.rotation.x   = quat.getX();
+    broadcastMsg.transform.rotation.y   = quat.getY();
+    broadcastMsg.transform.rotation.z   = quat.getZ();
+    broadcastMsg.transform.rotation.w   = quat.getW();
 
     pub.publish(odometryMsg);
+    // tf_pub.sendTransform(broadcastMsg);
 
     geometry_msgs::PoseStamped message;
 
