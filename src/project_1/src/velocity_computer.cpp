@@ -88,14 +88,24 @@ void velocityParametersChangeCallback(velocityComputerParamsConfig &config,
             newValue         = config.N;
             VelocityComputer::getInstance().setN(newValue);
             break;
+        case 5:
+            VelocityComputer::getInstance().setComputeMethod(
+                config.wheel_data_source == 0
+                    ? VelocityComputer::ComputeMethod::RMP
+                    : VelocityComputer::ComputeMethod::ENCODER);
+            break;
     }
 
-    VelocityComputer::getInstance().setComputeMethod(
-        config.wheel_data_source == 0
-            ? VelocityComputer::ComputeMethod::RMP
-            : VelocityComputer::ComputeMethod::ENCODER);
-
-    ROS_INFO(
-        "[VelocityComputer] Reconfiguring robot parameter: %s; new value: %lf",
-        parameterChanged.c_str(), newValue);
+    if (level >= 0 && level <= 4)
+    {
+        ROS_INFO(
+            "[VelocityComputer] Reconfiguring robot parameter: %s; new value: "
+            "%lf",
+            parameterChanged.c_str(), newValue);
+    }
+    else
+    {
+        ROS_INFO("Switched to " + config.wheel_data_source == 0 ? " RPM"
+                                                                : " ENCODER");
+    }
 }
