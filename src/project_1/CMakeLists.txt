@@ -14,9 +14,9 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules
 )
 generate_dynamic_reconfigure_options(
-  cfg/wheelsDataSource.cfg
-  cfg/robotPhysicalParameters.cfg
-  cfg/integrationMethod.cfg
+  cfg/odometryComputerParams.cfg
+  cfg/velocityComputerParams.cfg
+  cfg/wheelsVelocityComputerParams.cfg
 )
 find_package(Eigen REQUIRED)
 
@@ -72,7 +72,3 @@ target_link_libraries(wheels_velocity_computer ${catkin_LIBRARIES})
 add_executable(starting_position_detector src/starting_position_detector.cpp)
 add_dependencies(starting_position_detector ${catkin_EXPORTED_TARGETS})
 target_link_libraries(starting_position_detector ${catkin_LIBRARIES})
-
-add_executable(physical_params_setter src/physical_params_setter.cpp)
-add_dependencies(physical_params_setter ${catkin_EXPORTED_TARGETS})
-target_link_libraries(physical_params_setter ${catkin_LIBRARIES})
