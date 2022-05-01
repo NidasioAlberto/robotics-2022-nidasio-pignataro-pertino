@@ -63,6 +63,17 @@ void velocityParametersChangeCallback(velocityComputerParamsConfig &config,
 
     switch (level)
     {
+        case -1:
+            // Set all the parameters at the beginning
+            VelocityComputer::getInstance().setR(config.R);
+            VelocityComputer::getInstance().setL(config.L);
+            VelocityComputer::getInstance().setW(config.W);
+            VelocityComputer::getInstance().setT(config.T);
+            VelocityComputer::getInstance().setN(config.N);
+            VelocityComputer::getInstance().setComputeMethod(
+                config.wheel_data_source == 0
+                    ? VelocityComputer::ComputeMethod::RMP
+                    : VelocityComputer::ComputeMethod::ENCODER);
         case 0:
             parameterChanged = "Wheel radius [m]";
             newValue         = config.R;
@@ -105,10 +116,13 @@ void velocityParametersChangeCallback(velocityComputerParamsConfig &config,
     }
     else
     {
-        if(config.wheel_data_source == 0) {
+        if (config.wheel_data_source == 0)
+        {
             ROS_INFO("Switched to RPM");
-        } else {
-            ROS_INFO("Switched to ENCODER"); 
+        }
+        else
+        {
+            ROS_INFO("Switched to ENCODER");
         }
     }
 }
