@@ -1,4 +1,5 @@
 <launch>
+    <node pkg="project_1" type="physical_params_setter" name="physical_params_setter" output="screen" />
     <node pkg="project_1" type="odometry_computer" name="odometry_computer" output="screen" />
     <node pkg="project_1" type="position_comparison" name="position_comparison" output="screen" />
     <node pkg="project_1" type="starting_position_detector" name="starting_position_detector" output="screen" />

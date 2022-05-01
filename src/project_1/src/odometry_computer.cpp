@@ -43,8 +43,6 @@ int main(int argc, char **argv)
     OdometryComputer::getInstance().setIntegrationMethod(
         OdometryComputer::IntegrationMethod::EULER);
 
-    OdometryComputer::getInstance().setPosition({0, 0, 0});
-
     Subscriber sub = handle.subscribe("cmd_vel", 1000, velocityStateCallback);
     pub            = handle.advertise<nav_msgs::Odometry>("odom", 1000);
     pub2           = handle.advertise<geometry_msgs::PoseStamped>("pose", 1000);

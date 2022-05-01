@@ -178,6 +178,7 @@ void VelocityComputer::initTransformationMatrix()
 Eigen::Vector3d VelocityComputer::computeRobotVelocityWithRPM(
     const sensor_msgs::JointState::ConstPtr& msg)
 {
+    //std::cout << "Wheel radius " << R << std::endl;
     // Extract the wheels velocities from the encoders
     Eigen::Vector4d U;
     U[0] = msg->velocity[0];  // Front left
