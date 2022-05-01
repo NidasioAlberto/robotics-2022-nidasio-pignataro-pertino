@@ -66,15 +66,11 @@ void robotParametersChangeCallback(robotPhysicalParametersConfig &config,
     {
         case -1:
             // Set all the parameters at the beginning
-            VelocityComputer::getInstance().setR(config.R);
-            VelocityComputer::getInstance().setL(config.L);
-            VelocityComputer::getInstance().setW(config.W);
-            VelocityComputer::getInstance().setT(config.T);
-            VelocityComputer::getInstance().setN(config.N);
-            VelocityComputer::getInstance().setComputeMethod(
-                config.wheel_data_source == 0
-                    ? VelocityComputer::ComputeMethod::RMP
-                    : VelocityComputer::ComputeMethod::ENCODER);
+            WheelsVelocityComputer::getInstance().setR(config.R);
+            WheelsVelocityComputer::getInstance().setL(config.L);
+            WheelsVelocityComputer::getInstance().setW(config.W);
+            WheelsVelocityComputer::getInstance().setT(config.T);
+            WheelsVelocityComputer::getInstance().setN(config.N);
         case 0:
             parameterChanged = "Wheel radius [m]";
             newValue         = config.R;
