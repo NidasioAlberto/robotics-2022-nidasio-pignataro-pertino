@@ -105,7 +105,10 @@ void velocityParametersChangeCallback(velocityComputerParamsConfig &config,
     }
     else
     {
-        ROS_INFO("Switched to " + config.wheel_data_source == 0 ? " RPM"
-                                                                : " ENCODER");
+        if(config.wheel_data_source == 0) {
+            ROS_INFO("Switched to RPM");
+        } else {
+            ROS_INFO("Switched to ENCODER"); 
+        }
     }
 }
