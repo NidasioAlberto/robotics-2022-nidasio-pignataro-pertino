@@ -6,5 +6,5 @@
     <node pkg="project_1" type="wheels_velocity_computer" name="wheels_velocity_computer" output="screen" />
     <node type="rviz" name="rviz" pkg="rviz" args="-d $(find project_1)/rviz/odometry_with_rviz.rviz" />
     <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure" />
-    <node pkg="rosbag" type="play" name="player" args="--loop -r 10 $(find project_1)/../../bags/bag2.bag" />
+    <node pkg="rosbag" type="play" name="player" args="--loop -r 10 $(find project_1)/../../bags/bag3.bag" />
 </launch>
