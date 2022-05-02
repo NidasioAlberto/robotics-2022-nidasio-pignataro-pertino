@@ -178,8 +178,8 @@ void VelocityComputer::initTransformationMatrix()
 Eigen::Vector3d VelocityComputer::computeRobotVelocityWithRPM(
     const sensor_msgs::JointState::ConstPtr& msg)
 {
-    //std::cout << "Wheel radius " << R << std::endl;
-    // Extract the wheels velocities from the encoders
+    // std::cout << "Wheel radius " << R << std::endl;
+    //  Extract the wheels velocities from the encoders
     Eigen::Vector4d U;
     U[0] = msg->velocity[0];  // Front left
     U[1] = msg->velocity[1];  // Front right
@@ -231,7 +231,7 @@ Eigen::Vector3d VelocityComputer::computeRobotVelocityWithENCODER(
     previousTimestamp = msg->header.stamp.toSec();
     previousE         = E;
 
-    // Compute the robot velicity
+    // Compute the robot velocity
     return computeRobotVelocityFromWheelVelocity(U);
 }
 

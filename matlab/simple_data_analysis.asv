@@ -1,0 +1,6 @@
+load("parsed_data/bag3.mat")
+
+axis equal
+plot(optitrack.x, optitrack.y)
+grid on
+
