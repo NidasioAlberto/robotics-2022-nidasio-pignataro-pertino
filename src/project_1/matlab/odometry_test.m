@@ -25,6 +25,8 @@ plot(X_odom(1, :), X_odom(2, :), 'LineWidth', 2)
 plot(X_odom_best(1, :), X_odom_best(2, :), 'LineWidth', 2)
 axis equal
 grid on
+xlabel('x [m]')
+ylabel('y [m]')
 legend('OptiTrack', 'Odometry nominal', 'Odometry calibrated')
 
 % Plot orientation
@@ -34,4 +36,6 @@ plot(X_opti(3, :), 'LineWidth', 2)
 plot(X_odom(3, :), 'LineWidth', 2)
 plot(X_odom_best(3, :), 'LineWidth', 2)
 grid on
+xlabel('samples')
+ylabel('theta [rad]')
 legend('OptiTrack', 'Odometry nominal', 'Odometry calibrated')

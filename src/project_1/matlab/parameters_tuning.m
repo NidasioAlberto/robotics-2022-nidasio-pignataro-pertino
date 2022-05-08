@@ -10,12 +10,12 @@ R_DYNAMIC = 0.004;
 LW_CENTER = 0.3556;
 LW_DYNAMIC = 0.02;
 
-% [R_space1, LW_space1, errors1, best_R1, best_LW1, min_err1] = ...
-%     bag_error_calculation('parsed_data/bag1.mat', TEST_SIZE, R_CENTER, R_DYNAMIC, LW_CENTER, LW_DYNAMIC, T, N);
-% [R_space2, LW_space2, errors2, best_R2, best_LW2, min_err2] = ...
-%     bag_error_calculation('parsed_data/bag2.mat', TEST_SIZE, R_CENTER, R_DYNAMIC, LW_CENTER, LW_DYNAMIC, T, N);
-% [R_space3, LW_space3, errors3, best_R3, best_LW3, min_err3] = ...
-%     bag_error_calculation('parsed_data/bag3.mat', TEST_SIZE, R_CENTER, R_DYNAMIC, LW_CENTER, LW_DYNAMIC, T, N);
+[R_space1, LW_space1, errors1, best_R1, best_LW1, min_err1] = ...
+    bag_error_calculation('parsed_data/bag1.mat', TEST_SIZE, R_CENTER, R_DYNAMIC, LW_CENTER, LW_DYNAMIC, T, N);
+[R_space2, LW_space2, errors2, best_R2, best_LW2, min_err2] = ...
+    bag_error_calculation('parsed_data/bag2.mat', TEST_SIZE, R_CENTER, R_DYNAMIC, LW_CENTER, LW_DYNAMIC, T, N);
+[R_space3, LW_space3, errors3, best_R3, best_LW3, min_err3] = ...
+    bag_error_calculation('parsed_data/bag3.mat', TEST_SIZE, R_CENTER, R_DYNAMIC, LW_CENTER, LW_DYNAMIC, T, N);
 
 %% Plot error data
 figure
@@ -38,9 +38,9 @@ h3 = scatter3(best_LW3, best_R3, min_err3, 'filled', 'r');
 h3.SizeData = 100;
 
 % Plot labels
-xlabel('LW = robot dimension')
-ylabel('R = wheels radius')
-zlabel('error')
+xlabel('LW: robot dimension [m]')
+ylabel('R: wheels radius [m]')
+zlabel('Error [m]')
 grid on
 
 %% Best parameters overall

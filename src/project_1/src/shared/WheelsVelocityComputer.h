@@ -65,9 +65,9 @@ private:
     void initTransformationMatrix();
 
     // Robot parameters
-    double R = 0.07;       // Wheel radius [m]
+    double R = 0.075797;   // Wheel radius [m]
     double L = 0.2;        // Wheel position along x [m]
-    double W = 0.169;      // Wheel position along y [m]
+    double W = 0.158886;   // Wheel position along y [m]
     double T = 1.0 / 5.0;  // Gear ratio from motor to wheel
     double N = 42;         // Counts per revolution of the motor
 
