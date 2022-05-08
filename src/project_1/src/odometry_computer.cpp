@@ -22,13 +22,14 @@ bool resetStartingPose(project_1::ResetStartingPose::Request &req,
                        project_1::ResetStartingPose::Response &res);
 
 Publisher pub, pub2;
-// tf2_ros::TransformBroadcaster tf_pub;
+tf2_ros::TransformBroadcaster *tf_pub;
 
 int main(int argc, char **argv)
 {
     // Node setup
     init(argc, argv, "odometry_computer");
     NodeHandle handle;
+    tf_pub = new tf2_ros::TransformBroadcaster();
 
     // Setting up the dynamic server for dynamically reconfigure the integration
     // mode between EULER & RUNGHE_KUTTA
@@ -59,30 +60,51 @@ void velocityStateCallback(const geometry_msgs::TwistStamped::ConstPtr &msg)
     tf2::Quaternion quat;
 
     nav_msgs::Odometry odometryMsg;
-    geometry_msgs::TransformStamped broadcastMsg;
+    geometry_msgs::TransformStamped broadcastBaseLink;
+    geometry_msgs::TransformStamped broadcastOdom;
 
-    odometryMsg.header           = msg->header;
-    broadcastMsg.header          = msg->header;
-    odometryMsg.header.frame_id  = "world";
-    broadcastMsg.header.frame_id = "world";
+    odometryMsg.header       = msg->header;
+    broadcastBaseLink.header = msg->header;
+    broadcastOdom.header     = msg->header;
+    broadcastBaseLink.header.stamp =
+        ros::Time::now();  // This way TF doesn't die on bag reset. We didn't
+                           // find a better way to solve TF_OLD_DATA.
+    broadcastOdom.header.stamp =
+        ros::Time::now();  // This way TF doesn't die on bag reset. We didn't
+                           // find a better way to solve TF_OLD_DATA.
+    odometryMsg.header.frame_id       = "world";
+    broadcastBaseLink.child_frame_id  = "base_link";
+    broadcastBaseLink.header.frame_id = "odom";
+    broadcastOdom.header.frame_id     = "world";
+    broadcastOdom.child_frame_id      = "odom";
 
-    odometryMsg.pose.pose.position.x     = result[0];
-    odometryMsg.pose.pose.position.y     = result[1];
-    broadcastMsg.transform.translation.x = result[0];
-    broadcastMsg.transform.translation.y = result[1];
+    odometryMsg.pose.pose.position.x      = result[0];
+    odometryMsg.pose.pose.position.y      = result[1];
+    broadcastOdom.transform.translation.x = result[0];
+    broadcastOdom.transform.translation.y = result[1];
 
     quat.setEuler(0, 0, result[2]);
     odometryMsg.pose.pose.orientation.x = quat.getX();
     odometryMsg.pose.pose.orientation.y = quat.getY();
     odometryMsg.pose.pose.orientation.z = quat.getZ();
     odometryMsg.pose.pose.orientation.w = quat.getW();
-    broadcastMsg.transform.rotation.x   = quat.getX();
-    broadcastMsg.transform.rotation.y   = quat.getY();
-    broadcastMsg.transform.rotation.z   = quat.getZ();
-    broadcastMsg.transform.rotation.w   = quat.getW();
+    broadcastOdom.transform.rotation.x  = quat.getX();
+    broadcastOdom.transform.rotation.y  = quat.getY();
+    broadcastOdom.transform.rotation.z  = quat.getZ();
+    broadcastOdom.transform.rotation.w  = quat.getW();
+
+    quat.setEuler(0, 0, 0);
+    broadcastBaseLink.transform.rotation.x    = quat.getX();
+    broadcastBaseLink.transform.rotation.y    = quat.getY();
+    broadcastBaseLink.transform.rotation.z    = quat.getZ();
+    broadcastBaseLink.transform.rotation.w    = quat.getW();
+    broadcastBaseLink.transform.translation.x = 0;
+    broadcastBaseLink.transform.translation.y = 0;
+    broadcastBaseLink.transform.translation.z = 0;
 
     pub.publish(odometryMsg);
-    // tf_pub.sendTransform(broadcastMsg);
+    tf_pub->sendTransform(broadcastOdom);
+    tf_pub->sendTransform(broadcastBaseLink);
 
     geometry_msgs::PoseStamped message;
 
