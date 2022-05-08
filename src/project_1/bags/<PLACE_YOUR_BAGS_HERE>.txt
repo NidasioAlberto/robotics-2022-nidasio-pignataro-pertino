@@ -1,0 +1,4 @@
+Place your bags in this folder to test our project.
+Then modify the "odometry_interactive.launch" file in the following line:
+    <node pkg="rosbag" type="play" name="player" args="--loop -r 10 $(find project_1)/bags/YOUR_BAG_NAME.bag" />
+updating the command by replacing YOUR_BAG_NAME with the actual name of the bag you put in this folder.

@@ -15,8 +15,14 @@ The first robotics project (A.S. 2021/2022) consists in analyzing data coming fr
 
 ## How to use
 
-Extract the compressed archive and copy the project_1 folder into your ros workspace.
-To execute the launch file run:
+Extract the compressed archive and copy the project_1 folder into your ros workspace under the /path/to/ros_workspace/src folder. Then, place the bags in /project_1/bags and update the following command in the `odometry_interactive.launch` file:
+```
+c<node pkg="rosbag" type="play" name="player" args="--loop -r 10 $(find project_1)/bags/YOUR_BAG_NAME.bag" />
+```
+by replacing `YOUR_BAG_NAME` with the actual names of the bag you have uploaded in the specified folder.
+
+
+Finally, to execute the launch file run:
 ```
 catkin_make && roslaunch project_1 odometry_interactive.launch
 ```
