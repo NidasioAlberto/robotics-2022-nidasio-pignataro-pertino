@@ -18,7 +18,7 @@ The first robotics project (A.S. 2021/2022) consists in analyzing data coming fr
 Extract the compressed archive and copy the project_1 folder into your ros workspace.
 To execute the launch file run:
 ```
-roslaunch project_1 odometry_interactive.launch
+catkin_make && roslaunch project_1 odometry_interactive.launch
 ```
 
 ## Goals
