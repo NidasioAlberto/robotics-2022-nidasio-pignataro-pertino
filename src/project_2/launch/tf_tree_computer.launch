@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="project_2" type="tf_tree_computer" name="tf_tree_computer" output="screen" />
+    <node pkg="rosbag" type="play" name="player" args="--loop -r 5 $(find project_2)/bags/robotics1_final.bag" />
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find project_2)/rviz/rvizConfig.rviz" />
+</launch>
