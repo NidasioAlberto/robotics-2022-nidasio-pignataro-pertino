@@ -36,10 +36,10 @@ find_package(Eigen REQUIRED)
 #   FILES
 #   WheelsRpm.msg
 # )
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 ###################
 ## Configuration ##
@@ -53,6 +53,13 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS} ${tf2_r
 #################
 ## Executables ##
 #################
+add_executable(custom_odometry_computer src/custom_odometry_computer.cpp)
+add_dependencies(custom_odometry_computer ${catkin_EXPORTED_TARGETS})
+target_link_libraries(custom_odometry_computer ${catkin_LIBRARIES})
+
+add_executable(custom_velocity_computer src/custom_velocity_computer.cpp)
+add_dependencies(custom_velocity_computer ${catkin_EXPORTED_TARGETS})
+target_link_libraries(custom_velocity_computer ${catkin_LIBRARIES})
 
 add_executable(tf_tree_computer src/tf_tree_computer.cpp)
 add_dependencies(tf_tree_computer ${catkin_EXPORTED_TARGETS})

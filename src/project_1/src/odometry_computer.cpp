@@ -73,10 +73,10 @@ void velocityStateCallback(const geometry_msgs::TwistStamped::ConstPtr &msg)
         ros::Time::now();  // This way TF doesn't die on bag reset. We didn't
                            // find a better way to solve TF_OLD_DATA.
     odometryMsg.header.frame_id       = "world";
-    broadcastBaseLink.child_frame_id  = "base_link";
-    broadcastBaseLink.header.frame_id = "odom";
-    broadcastOdom.header.frame_id     = "world";
-    broadcastOdom.child_frame_id      = "odom";
+    broadcastBaseLink.child_frame_id  = "odom";
+    broadcastBaseLink.header.frame_id = "world";
+    broadcastOdom.header.frame_id     = "odom";
+    broadcastOdom.child_frame_id      = "base_link";
 
     odometryMsg.pose.pose.position.x      = result[0];
     odometryMsg.pose.pose.position.y      = result[1];
