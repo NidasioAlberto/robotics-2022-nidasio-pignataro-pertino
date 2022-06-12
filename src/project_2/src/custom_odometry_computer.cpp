@@ -38,10 +38,10 @@ void velocityStateCallback(const geometry_msgs::TwistStamped::ConstPtr &msg)
     nav_msgs::Odometry odometryMsg;
     geometry_msgs::TransformStamped broadcastOdom;
 
-    odometryMsg.header       = msg->header;
-    broadcastOdom.header     = msg->header;
-    broadcastOdom.header.frame_id     = "odom";
-    broadcastOdom.child_frame_id      = "base_link";
+    odometryMsg.header            = msg->header;
+    broadcastOdom.header          = msg->header;
+    broadcastOdom.header.frame_id = "odom";
+    broadcastOdom.child_frame_id  = "base_link";
 
     odometryMsg.pose.pose.position.x      = result[0];
     odometryMsg.pose.pose.position.y      = result[1];
