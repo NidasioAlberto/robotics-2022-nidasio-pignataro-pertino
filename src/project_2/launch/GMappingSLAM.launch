@@ -28,6 +28,7 @@
 	<!-- **************  GMapping **************  -->  
   	<include file="$(find project_2)/cfg/gmapping.launch.xml"/>
 
+	<!-- RVIZ and Bag -->
     <node type="rviz" name="rviz" pkg="rviz" args="-d $(find project_2)/rviz/rvizSLAMConfig.rviz" />
 	<node pkg="rosbag" type="play" name="player" args="$(find project_2)/bags/robotics1_final.bag --clock" />
 </launch>
