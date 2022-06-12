@@ -58,68 +58,86 @@ void velocityStateCallback(const geometry_msgs::TwistStamped::ConstPtr &msg)
 {
     Vector3d result = OdometryComputer::getInstance().computeOdometry(msg);
     tf2::Quaternion quat;
-
-    nav_msgs::Odometry odometryMsg;
-    geometry_msgs::TransformStamped broadcastBaseLink;
-    geometry_msgs::TransformStamped broadcastOdom;
-
-    odometryMsg.header       = msg->header;
-    broadcastBaseLink.header = msg->header;
-    broadcastOdom.header     = msg->header;
-    broadcastBaseLink.header.stamp =
-        ros::Time::now();  // This way TF doesn't die on bag reset. We didn't
-                           // find a better way to solve TF_OLD_DATA.
-    broadcastOdom.header.stamp =
-        ros::Time::now();  // This way TF doesn't die on bag reset. We didn't
-                           // find a better way to solve TF_OLD_DATA.
-    odometryMsg.header.frame_id       = "world";
-    broadcastBaseLink.child_frame_id  = "odom";
-    broadcastBaseLink.header.frame_id = "world";
-    broadcastOdom.header.frame_id     = "odom";
-    broadcastOdom.child_frame_id      = "base_link";
-
-    odometryMsg.pose.pose.position.x      = result[0];
-    odometryMsg.pose.pose.position.y      = result[1];
-    broadcastOdom.transform.translation.x = result[0];
-    broadcastOdom.transform.translation.y = result[1];
-
     quat.setEuler(0, 0, result[2]);
-    odometryMsg.pose.pose.orientation.x = quat.getX();
-    odometryMsg.pose.pose.orientation.y = quat.getY();
-    odometryMsg.pose.pose.orientation.z = quat.getZ();
-    odometryMsg.pose.pose.orientation.w = quat.getW();
-    broadcastOdom.transform.rotation.x  = quat.getX();
-    broadcastOdom.transform.rotation.y  = quat.getY();
-    broadcastOdom.transform.rotation.z  = quat.getZ();
-    broadcastOdom.transform.rotation.w  = quat.getW();
 
-    quat.setEuler(0, 0, 0);
-    broadcastBaseLink.transform.rotation.x    = quat.getX();
-    broadcastBaseLink.transform.rotation.y    = quat.getY();
-    broadcastBaseLink.transform.rotation.z    = quat.getZ();
-    broadcastBaseLink.transform.rotation.w    = quat.getW();
-    broadcastBaseLink.transform.translation.x = 0;
-    broadcastBaseLink.transform.translation.y = 0;
-    broadcastBaseLink.transform.translation.z = 0;
+    // Odometry message
+    {
+        nav_msgs::Odometry odometryMsg;
 
-    pub.publish(odometryMsg);
-    tf_pub->sendTransform(broadcastOdom);
-    tf_pub->sendTransform(broadcastBaseLink);
+        odometryMsg.header          = msg->header;
+        odometryMsg.header.frame_id = "world";
 
-    geometry_msgs::PoseStamped message;
+        odometryMsg.pose.pose.position.x = result[0];
+        odometryMsg.pose.pose.position.y = result[1];
 
-    message.header          = msg->header;
-    message.header.frame_id = "world";
-    message.pose.position.x = result[0];
-    message.pose.position.y = result[1];
+        odometryMsg.pose.pose.orientation.x = quat.getX();
+        odometryMsg.pose.pose.orientation.y = quat.getY();
+        odometryMsg.pose.pose.orientation.z = quat.getZ();
+        odometryMsg.pose.pose.orientation.w = quat.getW();
 
-    quat.setEuler(0, 0, result[2]);
-    message.pose.orientation.x = quat.getX();
-    message.pose.orientation.y = quat.getY();
-    message.pose.orientation.z = quat.getZ();
-    message.pose.orientation.w = quat.getW();
+        pub.publish(odometryMsg);
+    }
 
-    pub2.publish(message);
+    // Pose message
+    {
+        geometry_msgs::PoseStamped message;
+
+        message.header          = msg->header;
+        message.header.frame_id = "world";
+        message.pose.position.x = result[0];
+        message.pose.position.y = result[1];
+
+        quat.setEuler(0, 0, result[2]);
+        message.pose.orientation.x = quat.getX();
+        message.pose.orientation.y = quat.getY();
+        message.pose.orientation.z = quat.getZ();
+        message.pose.orientation.w = quat.getW();
+
+        pub2.publish(message);
+    }
+
+    // TF from world to odom
+    {
+        geometry_msgs::TransformStamped worldToOdom;
+
+        // This way TF doesn't die on bag reset. We didn't find a better way to
+        // solve TF_OLD_DATA.
+        worldToOdom.header.stamp = ros::Time::now();
+
+        worldToOdom.header.frame_id = "world";  // Parent
+        worldToOdom.child_frame_id  = "odom";   // Child
+
+        // Word and odom coincide
+        worldToOdom.transform.rotation.x    = 0;
+        worldToOdom.transform.rotation.y    = 0;
+        worldToOdom.transform.rotation.z    = 0;
+        worldToOdom.transform.rotation.w    = 1;
+        worldToOdom.transform.translation.x = 0;
+        worldToOdom.transform.translation.y = 0;
+        worldToOdom.transform.translation.z = 0;
+
+        tf_pub->sendTransform(worldToOdom);
+    }
+
+    // TF from odom to base_link
+    {
+        geometry_msgs::TransformStamped odomToBaseLink;
+
+        // This way TF doesn't die on bag reset. We didn't find a better way to
+        // solve TF_OLD_DATA.
+        odomToBaseLink.header.stamp = ros::Time::now();
+
+        odomToBaseLink.header.frame_id = "odom";       // Parent
+        odomToBaseLink.child_frame_id  = "base_link";  // Child
+
+        odomToBaseLink.transform.rotation.x    = quat.getX();
+        odomToBaseLink.transform.rotation.y    = quat.getY();
+        odomToBaseLink.transform.rotation.z    = quat.getZ();
+        odomToBaseLink.transform.rotation.w    = quat.getW();
+        odomToBaseLink.transform.translation.x = result[0];
+        odomToBaseLink.transform.translation.y = result[1];
+        tf_pub->sendTransform(odomToBaseLink);
+    }
 }
 
 /**
