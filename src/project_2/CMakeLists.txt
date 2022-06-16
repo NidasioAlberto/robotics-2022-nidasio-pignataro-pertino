@@ -12,30 +12,26 @@ find_package(catkin REQUIRED COMPONENTS
   tf2
   tf2_ros
   cmake_modules
+  cv_bridge
+  OpenCV
 )
-# generate_dynamic_reconfigure_options(
-#   cfg/odometryComputerParams.cfg
-#   cfg/velocityComputerParams.cfg
-#   cfg/wheelsVelocityComputerParams.cfg
-# )
+
 find_package(Eigen REQUIRED)
+
+find_package(OpenCV REQUIRED)
 
 #####################
 ##     Services    ##
 #####################
-# add_service_files(
-#   FILES
-#   ResetStartingPose.srv
-# )
+add_service_files(
+  FILES
+  SaveRobotTrajectory.srv
+)
 
 #####################
-## Custom messages ##
+##     Others      ##
 #####################
 
-# add_message_files(
-#   FILES
-#   WheelsRpm.msg
-# )
 generate_messages(
   DEPENDENCIES
   std_msgs
@@ -46,9 +42,9 @@ generate_messages(
 ###################
 catkin_package(
   DEPENDS Eigen
-  CATKIN_DEPENDS message_runtime tf2 tf2_ros
+  CATKIN_DEPENDS message_runtime tf2 tf2_ros cv_bridge
 )
-include_directories(include ${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS} ${tf2_ros_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS} ${tf2_ros_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
 #################
 ## Executables ##
@@ -65,18 +61,6 @@ add_executable(tf_tree_computer src/tf_tree_computer.cpp)
 add_dependencies(tf_tree_computer ${catkin_EXPORTED_TARGETS})
 target_link_libraries(tf_tree_computer ${catkin_LIBRARIES})
 
-# add_executable(position_comparison src/position_comparison.cpp)
-# add_dependencies(position_comparison ${catkin_EXPORTED_TARGETS})
-# target_link_libraries(position_comparison ${catkin_LIBRARIES})
-
-# add_executable(velocity_computer src/velocity_computer.cpp)
-# add_dependencies(velocity_computer ${catkin_EXPORTED_TARGETS})
-# target_link_libraries(velocity_computer ${catkin_LIBRARIES})
-
-# add_executable(wheels_velocity_computer src/wheels_velocity_computer.cpp)
-# add_dependencies(wheels_velocity_computer ${catkin_EXPORTED_TARGETS})
-# target_link_libraries(wheels_velocity_computer ${catkin_LIBRARIES})
-
-# add_executable(starting_position_detector src/starting_position_detector.cpp)
-# add_dependencies(starting_position_detector ${catkin_EXPORTED_TARGETS})
-# target_link_libraries(starting_position_detector ${catkin_LIBRARIES})
+add_executable(trajectory_printer src/trajectory_printer.cpp)
+add_dependencies(trajectory_printer ${catkin_EXPORTED_TARGETS})
+target_link_libraries(trajectory_printer ${catkin_LIBRARIES})
