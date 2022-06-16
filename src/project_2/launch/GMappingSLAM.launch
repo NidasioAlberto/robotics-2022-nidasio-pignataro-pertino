@@ -20,8 +20,8 @@
 	<param name="angle_min" value="-3.14"/>
 	<param name="angle_max" value="3.14"/>
 	<param name="angle_increment" value="0.004886922"/> <!-- study this value -->
-	<param name="scan_time" value="0.142857"/> <!-- study this value -->
-	<param name="range_min" value="0.26"/>
+	<param name="scan_time" value="0.2"/> <!-- study this value -->
+	<param name="range_min" value="0.12"/>
 	<param name="range_max" value="16.0"/>
 	</node>
 
