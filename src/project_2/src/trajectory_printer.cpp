@@ -65,10 +65,24 @@ void mapUpdateCallback(const nav_msgs::OccupancyGrid &updatedMap) {
 
 bool saveMapWithTrajectory(project_2::SaveRobotTrajectory::Request &req, project_2::SaveRobotTrajectory::Response &res) {
     ROS_INFO("Received request to save the map with the trajectory.");
+    int pixelX, pixelY;
 
+    //pixelX = (realX + originX)/res;
+    //pixelY = (realY + originY)/res;
+
+    cv::Mat flippedImg;
     cv::Mat imageFromOccupancyGrid = occupancyGridToCvMat(currentMap);
 
-    cv::imwrite("/home/paolo/Scrivania/lol.png", imageFromOccupancyGrid);
+    for(size_t i=0; i < robotTrajectory.poses.size(); i++) {
+        pixelX = (robotTrajectory.poses[i].pose.position.x + 40) / 0.05;
+        pixelY = (robotTrajectory.poses[i].pose.position.y + 40) / 0.05;
+        //ROS_INFO("Pixel X: %d, Pixel Y: %d", pixelX, pixelY);
+        imageFromOccupancyGrid.data[1600*pixelY+pixelX] = 0;
+    }
+
+    cv::flip(imageFromOccupancyGrid,flippedImg, 0);
+    //cv::rotate(flippedImg, cv::ROTATE_90_COUNTERCLOCKWISE);
+    cv::imwrite("/home/paolo/Scrivania/lol.png", flippedImg);
 
     return true;
 }
