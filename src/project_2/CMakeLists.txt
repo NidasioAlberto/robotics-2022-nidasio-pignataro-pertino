@@ -6,6 +6,7 @@ project(project_2)
 ###########################
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  roslib
   std_msgs
   message_generation
   dynamic_reconfigure

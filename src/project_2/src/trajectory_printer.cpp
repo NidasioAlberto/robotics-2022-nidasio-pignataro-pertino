@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include <ros/package.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -94,7 +95,7 @@ bool saveMapWithTrajectory(project_2::SaveRobotTrajectory::Request &req, project
 
     cv::flip(imageFromOccupancyGrid,imageFromOccupancyGrid, 0);
     cv::rotate(imageFromOccupancyGrid, imageFromOccupancyGrid, cv::ROTATE_90_COUNTERCLOCKWISE);
-    cv::imwrite("/home/paolo/Scrivania/map_with_trajectory.png", imageFromOccupancyGrid);
+    cv::imwrite(package::getPath("project_2").append("/robot_trajectory/map_with_trajectory.png"), imageFromOccupancyGrid);
 
     return true;
 }
