@@ -39,9 +39,9 @@ void velocityStateCallback(const geometry_msgs::TwistStamped::ConstPtr &msg)
     geometry_msgs::TransformStamped broadcastOdom;
 
     odometryMsg.header            = msg->header;
-    broadcastOdom.header          = msg->header;
+    broadcastOdom.header.stamp    = ros::Time::now();
     broadcastOdom.header.frame_id = "odom";
-    broadcastOdom.child_frame_id  = "base_link";
+    broadcastOdom.child_frame_id  = "base_footprint";
 
     odometryMsg.pose.pose.position.x      = result[0];
     odometryMsg.pose.pose.position.y      = result[1];

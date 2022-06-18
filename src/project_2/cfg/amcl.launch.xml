@@ -5,7 +5,7 @@
   <arg name="initial_pose_y"  default="0.0"/>
   <arg name="initial_pose_a"  default="0.0"/>
   <arg name="odom_frame_id"   default="odom"/>
-  <arg name="base_frame_id"   default="base_link"/>
+  <arg name="base_frame_id"   default="base_footprint"/>
   <arg name="global_frame_id" default="map"/>
 
   <node pkg="amcl" type="amcl" name="amcl">
@@ -15,7 +15,7 @@
     <param name="odom_model_type"           value="omni"/>   <!-- The robot we are studying is omnidirectional. -->
     <param name="odom_alpha5"               value="0.1"/>
     <param name="gui_publish_rate"          value="10.0"/>
-    <param name="laser_max_beams"           value="1285"/> <!-- from rostopic echo /scan_multi (default value: 60) -->
+    <param name="laser_max_beams"           value="60"/>
     <param name="laser_max_range"           value="16.0"/>
     <param name="min_particles"             value="500"/>
     <param name="max_particles"             value="2000"/>
