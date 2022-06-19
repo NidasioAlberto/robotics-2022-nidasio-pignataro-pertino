@@ -9,9 +9,7 @@
   <arg name="global_frame_id" default="map"/>
 
   <node pkg="amcl" type="amcl" name="amcl">
-    <!-- we can tune this param (in particular laser_max_beams & laser_max_range). The others depends on how the system is behaving. -->
     <param name="use_map_topic"             value="$(arg use_map_topic)"/>
-    <!-- Publish scans from best pose at a max of 10 Hz -->
     <param name="odom_model_type"           value="omni"/>   <!-- The robot we are studying is omnidirectional. -->
     <param name="odom_alpha5"               value="0.1"/>
     <param name="gui_publish_rate"          value="10.0"/>

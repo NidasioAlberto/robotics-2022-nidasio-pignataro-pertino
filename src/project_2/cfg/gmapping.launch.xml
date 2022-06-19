@@ -1,8 +1,3 @@
-<!--
-  PAPER 1 : https://www.politesi.polimi.it/bitstream/10589/164687/3/A%20Review%20of%202D%20SLAM%20Algorithms%20on%20ROS.pdf
-  PAPER 2 : https://www.researchgate.net/publication/341874647_Optimization_of_SLAM_Gmapping_based_on_Simulation
--->
-
 <launch>
   <arg name="scan_topic"  default="scan_multi" />
   <arg name="base_frame"  default="base_footprint"/>
@@ -12,12 +7,12 @@
     <param name="base_frame" value="$(arg base_frame)"/>
     <param name="odom_frame" value="$(arg odom_frame)"/>
     <param name="map_update_interval" value="5.0"/>
-    <param name="maxUrange" value="5.0"/> <!-- should be <= maxRange -->
-    <param name="maxRange" value="16.0"/> <!-- sensor max range is 16.0 m (from data sheet) -->
+    <param name="maxUrange" value="5.0"/>
+    <param name="maxRange" value="16.0"/>
     <param name="sigma" value="0.05"/>
     <param name="kernelSize" value="1"/>
-    <param name="lstep" value="0.4"/> <!-- modified in the paper -->
-    <param name="astep" value="0.1"/> <!-- modified in the paper -->
+    <param name="lstep" value="0.4"/>
+    <param name="astep" value="0.1"/>
     <param name="iterations" value="5"/>
     <param name="lsigma" value="0.075"/>
     <param name="ogain" value="3.0"/>
@@ -27,11 +22,11 @@
     <param name="srt" value="0.3"/>
     <param name="str" value="0.2"/>
     <param name="stt" value="0.3"/>
-    <param name="linearUpdate" value="1.0"/> <!-- modified in the paper -->
-    <param name="angularUpdate" value="0.5"/> <!-- modified in the paper -->
-    <param name="temporalUpdate" value="5.0"/> <!-- modified in the paper -->
+    <param name="linearUpdate" value="1.0"/>
+    <param name="angularUpdate" value="0.5"/>
+    <param name="temporalUpdate" value="5.0"/>
     <param name="resampleThreshold" value="0.8"/>
-    <param name="particles" value="30"/>  <!-- too many particles will cause lag | Modified in the paper -->
+    <param name="particles" value="30"/>
 
     <param name="xmin" value="-40.0"/>
     <param name="ymin" value="-40.0"/>
