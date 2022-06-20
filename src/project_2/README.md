@@ -63,6 +63,14 @@ Then use:
     catkin_make && roslaunch project_2 AMCLLocalization.launch
 ```
 
+## Service to Save the map with trajectory
+The node which enable the requested service to be called is launched within the `AMCLLocalization.launch` file. So in order to use it, follow the instruction above, and then, once you have run that file, use this command to save the map with the trajectory plotted on it:
+```
+    rosservice call /save_map_with_trajectory
+```
+The map will be saved under the `robot_trajectory` folder with the name `map_with_trajectory.png`.
+>*NOTE*: if you call the service multiple times, the previous images will be overwritten.
+
 ## Goals
 | Goal                                                |                                                                 Status                                                                  |
 | :-------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------: |
@@ -82,13 +90,15 @@ The header files are:
 
 The nodes are:
 - `custom_velocity_computer.cpp`: Node that computes the robot velocity listening to the 4 wheels velocities (Using the `VelocityComputer.h`);
-- `custom_odometry_computer.cpp`: Node that computes the odometry listening to the robot velocity (Using the `OdometryComputer.h`) and publish the transformation Odom -> BaseLink;
+- `custom_odometry_computer.cpp`: Node that computes the odometry listening to the robot velocity (Using the `OdometryComputer.h`) and publish the transformation Odom -> BaseFootprint;
 - `tf_tree_computer.cpp`: Node used only when using the odometry provided with the bag files (by default we use the nodes described before which come from the project_1);
 - `trajectory_printer.cpp`: Node which creates the service to save the map with the trajectory followed by the robot (from start until the service call) plotted on it.
 
 ## Folder Structure
+In this section it follows our folder structure in order to give a better understanding of the interactions they have with the project itself (espceially `maps` and `robot_trajectory`).
 ```
 ├── assets // Images used in this report
+│   ├── map_bag1.png
 │   ├── Meccanum wheels robot diagram.png
 │   ├── MM's robot.png
 │   └── tftree.png
@@ -109,10 +119,11 @@ The nodes are:
 ├── package.xml
 ├── README.md
 ├── robot_trajectory // Folder in which the map+trajectory is saved.
-│   └── Trajectories Recorded in Testing
-│       ├── map_with_trajectoryBAG2.png
+│   └── Trajectories Recorded in Testing // Plots for testing.
+│       ├── map_with_trajectory_BAG1.png
+│       ├── map_with_trajectory_BAG2.png
 │       └── map_with_trajectory_BAG3.png
-├── rviz // Folder for RViz configurations
+├── rviz // Folder for RViz configurations.
 │   ├── rvizLocalizationConfig.rviz
 │   └── rvizSLAMConfig.rviz
 ├── src  // Folder which contains all our nodes.
@@ -128,6 +139,7 @@ The nodes are:
     └── SaveRobotTrajectory.srv
 ```
 ## Images
+We provide already compiled images representing the map we generated with the bag 1 (first picture), and the trajectories of the robot for each bag provided (in the last 3 pictures).
 | Map created with GMapping                          | Bag 1 trajectory                                                                                          |
 | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | ![Map created with GMapping ](assets/map_bag1.png) | ![Bag 1 trajectory](robot_trajectory/Trajectories%20Recorded%20in%20Testing/map_with_trajectory_BAG1.png) |
@@ -140,7 +152,7 @@ The nodes are:
 ![TF tree](assets/tftree.png)
 
 ## Trajectory printing
-The idea behind the trajectory drawing technique is to listen for robot position and for map updates. Once the service is called, the method `saveMapWithTrajectory` is called and the first thing that it does is to convert the map created so far into a `cv::Mat` matrix. After the map has been created, for every robot position (all the positions are saved during the processing) if it is the first position, it draws a point, else it draws a line between the current examined position and the previous one. Once the trajectory drawing is complete, it saves the matrix as an image inside the `robot_trajectory` directory.
+The idea behind the trajectory drawing technique is to listen for robot position and for map updates. Once the service is called, the method `saveMapWithTrajectory` is called and the first thing that it does is to convert the map provided (since we are running the map server, the node subscribe to the `/map` topic to retrieve the `OccupancyGrid` message) into a `cv::Mat` matrix. After the map has been created, for every robot position (all the positions are saved during the processing by storing each message coming from the `/amcl_pose` topic into a `Path` object) if it is the first position, it draws a point, else it draws a line between the current examined position and the previous one. Once the trajectory drawing is complete, it saves the matrix as an image inside the `robot_trajectory` directory.
 
 Here are some relevant info:
  - `occupancyGridToCvMat`: it defines 3 main colors (black, white and grey). With these colors, this method parses all the 1600x1600 occupancy grid matrix and for every cell it sets inside the `cv::Mat` the corresponding black, white or grey pixel depending on the cell occupancy status;
