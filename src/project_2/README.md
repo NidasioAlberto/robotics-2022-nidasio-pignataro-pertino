@@ -20,7 +20,7 @@ Extract the compressed archive and copy the project_2 folder into your ros works
 ```
 <node pkg="rosbag" type="play" name="player" args="$(find project_2)/bags/YOUR_BAG_NAME.bag --clock" />
 ```
-by replacing `YOUR_BAG_NAME` with the actual names of the bag you have uploaded in the specified folder.
+by replacing `YOUR_BAG_NAME` with the actual name of the bag you have uploaded in the specified folder.
 
 >**DISCLAIMER**: we used `robotics1_final.bag` to compute the map, and `robotics2_final.bag` & `robotics3_final.bag` for the localization task.
 
@@ -28,6 +28,7 @@ by replacing `YOUR_BAG_NAME` with the actual names of the bag you have uploaded 
 Finally you can proceed by executing the launch files following the steps below.
 
 ## Mapping
+>*REQUIREMENTS*: ira_laser_tools must be installed in order to execute this launch file (see more on the [ira_laser_tools' repo](https://github.com/iralabdisco/ira_laser_tools))
 
 For the SLAM task we used `GMapping`. We provide, as requested, a launch file to run:
 1. Velocity and Odometry computers (from project_1) in order to compute the odometry by directly taking encoders data from the bag.
@@ -41,10 +42,12 @@ Then use:
 ```
     catkin_make && roslaunch project_2 GMappingSLAM.launch
 ```
+>*NOTE*: more infos about the parameter we changed for GMapping  can be found into its launch config file.
 
 ## Localization
+>*REQUIREMENTS*: ira_laser_tools must be installed in order to execute this launch file (see more on the [ira_laser_tools' repo](https://github.com/iralabdisco/ira_laser_tools))
 
-For the AMCL localization task we are using `AMCL`. We provide, as requested, a launch file to run:
+For the localization task we are using `AMCL`. We provide, as requested, a launch file to run:
 1. Velocity and Odometry computers (from project_1) in order to compute the odometry by directly taking encoders data from the bag.
 2. Trajectory printer node, used to offer the requested service for plotting the trajectory followed by the robot (from start until the service call) on the map and then saving it locally.
 3. 4 static transform publishers to publish the TF transform for the 2 lidars (`base_link` -> `rear/front lidar`), one for `base_footprint` -> `base_link` and the last one for `base_link` to `scan`.
@@ -62,6 +65,8 @@ Then use:
 ```
     catkin_make && roslaunch project_2 AMCLLocalization.launch
 ```
+
+>*NOTE*: more infos about the parameter we changed for AMCL can be found into its launch config file.
 
 ## Service to Save the map with trajectory
 The node which enable the requested service to be called is launched within the `AMCLLocalization.launch` file. So in order to use it, follow the instruction above, and then, once you have run that file, use this command to save the map with the trajectory plotted on it:
@@ -91,7 +96,7 @@ The header files are:
 The nodes are:
 - `custom_velocity_computer.cpp`: Node that computes the robot velocity listening to the 4 wheels velocities (Using the `VelocityComputer.h`);
 - `custom_odometry_computer.cpp`: Node that computes the odometry listening to the robot velocity (Using the `OdometryComputer.h`) and publish the transformation Odom -> BaseFootprint;
-- `tf_tree_computer.cpp`: Node used only when using the odometry provided with the bag files (by default we use the nodes described before which come from the project_1);
+- `tf_tree_computer.cpp`: Node used only when using the odometry provided with the bag files (by default we use the nodes described before which come from the project_1 and not this one);
 - `trajectory_printer.cpp`: Node which creates the service to save the map with the trajectory followed by the robot (from start until the service call) plotted on it.
 
 ## Folder Structure

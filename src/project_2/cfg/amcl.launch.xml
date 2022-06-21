@@ -13,7 +13,7 @@
     <param name="odom_model_type"           value="omni"/>   <!-- The robot we are studying is omnidirectional. -->
     <param name="odom_alpha5"               value="0.1"/>
     <param name="gui_publish_rate"          value="10.0"/>
-    <param name="laser_max_beams"           value="60"/>
+    <param name="laser_max_beams"           value="60"/>     <!-- We found out that by keeping this value to 60 was ok. -->
     <param name="laser_max_range"           value="16.0"/>
     <param name="min_particles"             value="500"/>
     <param name="max_particles"             value="2000"/>

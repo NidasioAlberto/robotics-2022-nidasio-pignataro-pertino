@@ -30,6 +30,11 @@ int main(int argc, char **argv)
     init(argc, argv, "trajectory_printer");
     NodeHandle handle;
 
+    /**
+     * We use 2 subscribers:
+     *  (*) /amcl_pose topic to save the current estimated robot position.
+     *  (*) /map to save locally the OccupancyGrid we are using.
+     */
     Subscriber AMCLPoseSubscriber = handle.subscribe("amcl_pose", 1000, currentPoseCallback); // Listen to amcl_pose topic
     Subscriber MAPTopicSubscriber = handle.subscribe("map", 1000, mapUpdateCallback);
 
@@ -50,6 +55,14 @@ int main(int argc, char **argv)
     spin();
 }
 
+/**
+ * @brief Updates the path followed by the robot.
+ * 
+ * Once AMCL is running, it publishes the robot current pose with covariance into the /amcl_pose
+ * topic. This method stores that position into a nav_msgs::Path object.
+ * 
+ * @param currentPose the pose with covariance published by AMCL under the /amcl_pose topic. 
+ */
 void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped &currentPose) {
     geometry_msgs::PoseStamped newPose;
 
@@ -60,10 +73,19 @@ void currentPoseCallback(const geometry_msgs::PoseWithCovarianceStamped &current
     pub.publish(robotTrajectory);
 }
 
+/**
+ * @brief Update the local version of the OccupancyGrid whenever it gets updated by the map server.
+ * 
+ * @param updatedMap the OccupancyGrid update coming from the map server.
+ */
 void mapUpdateCallback(const nav_msgs::OccupancyGrid &updatedMap) {
     currentMap = updatedMap;
 }
 
+/**
+ * @brief callback for the SaveMapWithTrajectory service. It takes the local Path object with all the poses the robot has been until now
+ * and plots them onto the OccupancyGrid, finally saving the computed image locally into the robot_trajectory folder.
+ */
 bool saveMapWithTrajectory(project_2::SaveRobotTrajectory::Request &req, project_2::SaveRobotTrajectory::Response &res) {
     ROS_INFO("Received request to save the map with the trajectory.");
     int pixelX, pixelY;
@@ -72,14 +94,21 @@ bool saveMapWithTrajectory(project_2::SaveRobotTrajectory::Request &req, project
 
     cv::Mat imageFromOccupancyGrid = occupancyGridToCvMat(currentMap);
 
-    // Setting up the color for the trajectory
+    // Setting up the color for the trajectory (BGR format) (in this case (0,153,0) == GREEN)
     cv::Vec3b trajectoryColor;
     trajectoryColor[0] = 0;
     trajectoryColor[1] = 153;
     trajectoryColor[2] = 0;
 
-
+    /** Foreach pose saved into the local Path object:
+     *      (*) If that pose is the first one it draws a point;
+     *      (*) if it's not the first pose examined, it draws a line between the current pixel examined and the last one.
+    */
     for(size_t i=0; i < robotTrajectory.poses.size(); i++) {
+        /**
+         * pixelX = (robotPoseX + mapOriginX) / mapResolution  (see more infos in map_bag1.yaml)
+         * pixelY = (robotPoseY + mapOriginY) / mapResolution  (see more infos in map_bag1.yaml)
+         */
         pixelX = (robotTrajectory.poses[i].pose.position.x + abs(currentMap.info.origin.position.x)) / currentMap.info.resolution;
         pixelY = (robotTrajectory.poses[i].pose.position.y + abs(currentMap.info.origin.position.y)) / currentMap.info.resolution;
 
@@ -97,9 +126,16 @@ bool saveMapWithTrajectory(project_2::SaveRobotTrajectory::Request &req, project
     cv::rotate(imageFromOccupancyGrid, imageFromOccupancyGrid, cv::ROTATE_90_COUNTERCLOCKWISE);
     cv::imwrite(package::getPath("project_2").append("/robot_trajectory/map_with_trajectory.png"), imageFromOccupancyGrid);
 
+    res.service_status = true;
     return true;
 }
 
+/**
+ * @brief Converts an OccupancyGrid object into an OpenCv Mat object (easier to edit).
+ * 
+ * @param map the OccupancyGrid to convert.
+ * @return cv::Mat the OccupancyGrid transformed into an OpenCv::Mat object.
+ */
 cv::Mat occupancyGridToCvMat(const nav_msgs::OccupancyGrid map)
 {
   uint8_t *data = (uint8_t*) map.data.data(),
