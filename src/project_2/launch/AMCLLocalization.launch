@@ -8,10 +8,10 @@
 	<node pkg="project_2" type="custom_velocity_computer" name="custom_velocity_computer" output="screen" />
     <node pkg="project_2" type="trajectory_printer" name="trajectory_printer" output="screen" />
 
-    <node pkg="tf" type="static_transform_publisher" name="base_link_to_rear_laser_broadcaster" args="-0.35 0.0 0.0 0.0 0.0 0.866 0.5 base_link laser_rear 100" />
-    <node pkg="tf" type="static_transform_publisher" name="base_link_to_front_laser_broadcaster" args="0.35 0.0 0.0 0.0 0.0 0.5150381 0.8571673 base_link laser_front 100" />
-    <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_base_link" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 base_footprint base_link 100" />
-    <node pkg="tf" type="static_transform_publisher" name="base_link_to_scan" args="0.0 0.0 0.0 0.0 0.0 0.0 base_link scan 100" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_rear_laser_broadcaster" args="-0.35 0.0 0.0 0.0 0.0 0.866 0.5 base_link laser_rear" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_front_laser_broadcaster" args="0.35 0.0 0.0 0.0 0.0 0.5150381 0.8571673 base_link laser_front" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_footprint_to_base_link" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 base_footprint base_link" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_scan" args="0.0 0.0 0.0 0.0 0.0 0.0 base_link scan" />
 
     <node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger" output="screen">
 	<param name="destination_frame" value="base_link"/>
@@ -40,5 +40,5 @@
 
     <!-- RVIZ and Bag -->
     <node type="rviz" name="rviz" pkg="rviz" args="-d $(find project_2)/rviz/rvizLocalizationConfig.rviz" />
-    <node pkg="rosbag" type="play" name="player" args="$(find project_2)/bags/robotics1_final.bag --clock" />
+    <node pkg="rosbag" type="play" name="player" args="$(find project_2)/bags/robotics2_final.bag --clock" />
 </launch>
